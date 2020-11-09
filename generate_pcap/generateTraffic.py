@@ -4,7 +4,8 @@ import socket
 import sys 
 import time
 
-session_id = b'\x12\x34\x56\x78\x90'
+compressed_file = "stuff.gz"
+session_id = b'\x12\x34\x11\x21\x90'
 server_ip = "192.168.7.135"
 local_ip = "192.168.7.140"
 hb_int = 0
@@ -42,8 +43,11 @@ send(hb)
 time.sleep(.2)
 gcount = gcount +1 
 #build/send data packet
-stuff = "aaaaaaaaaaaaaaaabbbbbbbbbbbbbcccccccccccccccdddddddddddddddddeeeeeeeeeeeeeeeeeeffffffffffffffffffffggggggggggg"
-chunks, chunk_size = len(stuff), 10
+#stuff = "aaaaaaaaaaaaaaaabbbbbbbbbbbbbcccccccccccccccdddddddddddddddddeeeeeeeeeeeeeeeeeeffffffffffffffffffffggggggggggg"
+with open(compressed_file, mode='rb') as file: 
+    stuff = file.read()
+
+chunks, chunk_size = len(stuff), 100
 list_stuff = [ stuff[i:i+chunk_size] for i in range(0, chunks, chunk_size) ]
 data_remaining = len(list_stuff)-1 #account for 0 math
 for item in list_stuff:
