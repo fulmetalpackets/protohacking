@@ -5,17 +5,29 @@ import sys
 import time
 
 session_id = b'\x12\x34\x56\x78\x90'
+server_ip = "192.168.7.135"
+local_ip = "192.168.7.140"
 hb_int = 0
 pkt_sent = 0
 gcount = 0
-hb = Header(ipaddress="192.168.7.140",checksum=0x1212,message_type=3)/Heartbeat(count=gcount,sessionId=session_id)
+hb = IP(dst=server_ip)/UDP(sport=4321,dport=4321)/Header(ipaddress="192.168.7.140",message_type=3)/Heartbeat(count=gcount,sessionId=session_id)
+
+#Create UDP/IP Socket
+#Only so can remove ICMP
+udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#Bind the udp socket to the port
+udp_server_address = (local_ip,4321)
+print('starting up udp port on: ',udp_server_address)
+udp_socket.bind(udp_server_address)
+
+#Create TCP StreamSocket
 s=socket.socket()
-s.connect(("192.168.7.135",1234))
+s.connect((server_ip,1234))
 ss=StreamSocket(s,Raw) #generates connected message
 time.sleep(1) #wait for waiting for data message
 
 #first packet - request
-request=Header(ipaddress="192.168.7.140",checksum=0x1212)/Request(sessionId=session_id)
+request=Header(ipaddress="192.168.7.140")/Request(sessionId=session_id)
 request.show()
 x = ss.sr1(request)
 x.show()
@@ -26,7 +38,7 @@ else:
     sys.exit()
 
 #send hb packet
-ss.send(hb)
+send(hb)
 time.sleep(.2)
 gcount = gcount +1 
 #build/send data packet
@@ -35,13 +47,12 @@ chunks, chunk_size = len(stuff), 10
 list_stuff = [ stuff[i:i+chunk_size] for i in range(0, chunks, chunk_size) ]
 data_remaining = len(list_stuff)-1 #account for 0 math
 for item in list_stuff:
-    print(item)
-    d = Header(ipaddress="192.168.7.140",checksum=0x1212,message_type=4)/Data(remaining=data_remaining,data=item)
+    d = Header(ipaddress="192.168.7.140",message_type=4)/Data(remaining=data_remaining,data=item)
     #check if we need to send hb
     if pkt_sent != 0 and pkt_sent % hb_int == 0:
         hb[Heartbeat].count=gcount
         gcount = gcount + 1
-        ss.send(hb)
+        send(hb)
         pkt_sent = 0
     #send data
     d.show()

@@ -3,73 +3,51 @@ from fake_proto import *
 import socket
 import sys
 
-
+server_ip='192.168.7.135'
 gcount = 0
-session = b'';
+session = b''
 def parse_data(pkt):
     global gcount
     global session
-    pkt.show()
     if Request in pkt:
+        pkt.show()
         session = pkt[TCP][Request].sessionId
-        #p = IP(dst=pkt[IP].src)/TCP(sport=pkt[TCP].dport,dport=pkt[TCP].sport)/Header(message_type=2)/Respond(sessionId=pkt[TCP][Request].sessionId,heartbeat_interval=5)
-        p = Header(ipaddress="192.168.7.135",checksum=0x1212,message_type=2)/Respond(sessionId=session,heartbeat_interval=3)
-        p.show()
-        connection.sendall(bytes(p))
+        p = Header(ipaddress="192.168.7.135",message_type=2)/Respond(sessionId=session,heartbeat_interval=3)
+        #p.show()
+        tcp_connection.sendall(bytes(p))
     if Data in pkt:
+        pkt.show()
         gcount= gcount +1
         if pkt[TCP][Data].remaining == 0:
-            p = Header(ipaddress="192.168.7.135",checksum=0x1212,message_type=3)/Heartbeat(count=gcount,sessionId=session)
-            p.show()
-            connection.sendall(bytes(p))
+            p = IP(dst=pkt[IP].src)/UDP(sport=4321,dport=4321)/Header(ipaddress="192.168.7.135",message_type=3)/Heartbeat(count=gcount,sessionId=session)
+            #p.show()
+            send(p)
     if Heartbeat in pkt:
+        pkt.show()
         print("HB recieved")
         
     # return True
 
+#Create UDP/IP Socket
+udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#Bind the udp socket to the port
+udp_server_address = (server_ip,4321)
+print('starting up udp port on: ',udp_server_address)
+udp_socket.bind(udp_server_address)
+
 # Create a TCP/IP socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Bind the socket to the port
-server_address = ('192.168.7.135', 1234)
-print('starting up on: ',server_address)
-sock.bind(server_address)
-sock.listen(1)
-connection, client_address = sock.accept()
-traffic_filter = "tcp and port 1234"
+tcp_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Bind the tcp socket to the port
+tcp_server_address = (server_ip, 1234)
+print('starting up tcp port on: ',tcp_server_address)
+tcp_sock.bind(tcp_server_address)
+tcp_sock.listen(1)
+tcp_connection, tcp_client_address = tcp_sock.accept()
+
+
+
+traffic_filter = "(tcp and port 1234) or (udp and port 4321)"
 print("sniffing...")
 sniff(stop_filter=parse_data,filter=traffic_filter,iface="ens160")
 
 
-'''
-# Create a TCP/IP socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Bind the socket to the port
-server_address = ('172.24.173.126', 1234)
-print('starting up on: ',server_address)
-sock.bind(server_address)
-
-# Listen for incoming connections
-sock.listen(1)
-
-while True:
-    # Wait for a connection
-    print('waiting for a connection...')
-    connection, client_address = sock.accept()
-    try:
-        print('connection from: ', client_address)
-
-        # Receive the data in small chunks and retransmit it
-        while True:
-            data = connection.recv(16)
-            print('received: ' , data)
-            if data:
-                print('sending data back to the client')
-                connection.sendall(data)
-            else:
-                print('no more data from', client_address)
-                break
-            
-    finally:
-        # Clean up the connection
-        connection.close()
-'''
