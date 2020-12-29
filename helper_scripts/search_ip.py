@@ -1,5 +1,6 @@
 from scapy.all import *
 import socket, struct
+import argparse 
 
 def long2ip(ip):
     return socket.inet_ntoa(ip)
@@ -31,8 +32,12 @@ def searchPayload(payload):
             break
         x = x + 4
 
-pcapFile = sys.argv[1]
-packets = rdpcap(pcapFile)
+# main
+parser = argparse.ArgumentParser()
+parser.add_argument("pcapFile", help="pcap file to search for IPs in payload")
+parser.add_argument("-a",'--all', dest='all', default=False, action='store_true',help="Display all matches. Default only displays IPs found also in IP header")
+args = parser.parse_args()
+packets = rdpcap(args.pcapFile)
 packetIps = []
 payloadIps = []
 matchIps = []
@@ -53,9 +58,10 @@ for p in packets:
         searchPayload(payload)
     packetNumber = packetNumber + 1
 
-print("\n########## Possible IPs found in payloads ##############")
-for i in payloadIps:
-    print("Packet Number:" + str(i[1]) + " IP: " + i[0])
+if args.all:
+    print("\n########## Possible IPs found in payloads ##############")
+    for i in payloadIps:
+        print("Packet Number:" + str(i[1]) + " IP: " + i[0])
 
 print("\n########## Possible IPs found in payload that match packets source or destination IPs ##############")
 for m in matchIps:
