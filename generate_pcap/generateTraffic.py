@@ -3,15 +3,21 @@ from fake_proto import *
 import socket
 import sys 
 import time
+import os
+import requests
 
 compressed_file = "stuff.gz"
-session_id = b'\x12\x34\x11\x21\x90'
+session_id = os.urandom(5)#b'\x12\x34\x11\x21\x90' 
 server_ip = "192.168.7.135"
 local_ip = "192.168.7.140"
 hb_int = 0
 pkt_sent = 0
 gcount = 0
-hb = IP(dst=server_ip)/UDP(sport=4321,dport=4321)/Header(ipaddress="192.168.7.140",message_type=3)/Heartbeat(count=gcount,sessionId=session_id)
+#get random coordinates for hb packet
+resp = requests.get("https://api.3geonames.org/?randomland=yes&json=1")
+resp_json = resp.json()
+geo_coordinates = resp_json['major']['latt'] + ',' + resp_json['major']['longt']
+hb = IP(dst=server_ip)/UDP(sport=4321,dport=4321)/Header(ipaddress="192.168.7.140",message_type=3)/Heartbeat(count=gcount,sessionId=session_id,geo=geo_coordinates)
 
 #Create UDP/IP Socket
 #Only so can remove ICMP
