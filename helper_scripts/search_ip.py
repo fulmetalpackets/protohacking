@@ -59,7 +59,7 @@ for p in packets:
         searchPayload(payload)
     packetNumber = packetNumber + 1
 
-print("*** Only reporting first packet IP is discovered in ***")
+print("\n*** Only reporting first packet IP is discovered in ***")
 if args.all:
     print("\n########## Possible IPs found in payloads ##############")
     for i in payloadIps:
