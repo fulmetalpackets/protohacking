@@ -8,17 +8,18 @@ import argparse
 import os
 import binwalk
 
+#User defined function, different for each protocol disecting
 def getData(packets):
     dataPayload = b''
     for p in packets:
-        #This requires knowledge of they payload format
+        #Structures comes from fake_proto.py
         if Data in p:
             dataPayload = dataPayload + p[TCP][Header][Data].data
     return dataPayload
 
+#Given byte stream, calculate Shannon Entropy
 def entropy(data):
     e = 0
-
     counter = collections.Counter(data)
     l = len(data)
     for count in counter.values():
@@ -46,7 +47,7 @@ if args.outdir:
 
 if not os.path.exists(outdir):
     os.makedirs(outdir)
-fullpath = outdir +os.sep + datafile
+fullpath = outdir + os.sep + datafile
 
 f = open(fullpath, 'w+b')
 f.write(data)
@@ -75,7 +76,7 @@ f.close()
 if readelf_call.stderr != None:
     print("Error occured: " + readelf_call.stderr.decode("utf-8"))
 print("readelf output saved to file.")  
-#and entropy test 
+#Shannon entropy test 
 print("Running Shannon entropy test on data...")
 print("Data stream Shannon Entropy: " + str(entropy(data))) 
 # binwalk entropy test
