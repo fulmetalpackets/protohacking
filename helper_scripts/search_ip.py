@@ -2,13 +2,9 @@ from scapy.all import *
 import socket, struct
 import argparse 
 
+#expects a long to convert to an ip address using socket
 def long2ip(ip):
     return socket.inet_ntoa(ip)
-
-    # Convert an IP string to long
-def ip2long(ip):
-    packedIP = socket.inet_aton(ip)
-    return struct.unpack("!L", packedIP)[0]
 
 #expects list of tuples where the first value is compared with the passed in value
 def compare(in_list,in_value):
@@ -18,6 +14,7 @@ def compare(in_list,in_value):
     return False
 
 # don't save duplicates
+# only searches startin at the first byte of the payload and moves every 4 bytes.  Does not consider every possible 4 byte combination.
 def searchPayload(payload):
     x = 0
     while True:
@@ -38,9 +35,13 @@ parser.add_argument("pcapFile", help="pcap file to search for IPs in payload")
 parser.add_argument("-a",'--all', dest='all', default=False, action='store_true',help="Display all matches. Default only displays IPs found also in IP header")
 args = parser.parse_args()
 packets = rdpcap(args.pcapFile)
+#list of IPs found in the IP layer of the packets
 packetIps = []
+#list of valid IP addresses found in the payloads of the packets
 payloadIps = []
+# IPs found in the payload that match any IPs in the IP layers
 matchIps = []
+
 packetNumber = 1
 payload = None
 
@@ -58,6 +59,7 @@ for p in packets:
         searchPayload(payload)
     packetNumber = packetNumber + 1
 
+print("\n*** Only reporting first packet IP is discovered in ***")
 if args.all:
     print("\n########## Possible IPs found in payloads ##############")
     for i in payloadIps:

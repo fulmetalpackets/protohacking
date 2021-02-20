@@ -1,9 +1,9 @@
 from scapy.all import *
-from proto1 import *
+from proto2 import *
 
 pcapFile = sys.argv[1]
 packets = rdpcap(pcapFile)
 
 for p in packets:
-    if firstpacket in p:
+    if secondpacket in p:
         p.show()
