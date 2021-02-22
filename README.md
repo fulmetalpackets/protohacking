@@ -31,3 +31,19 @@ optional arguments:
 ### data_test
 This script is designed to automate very simple test on a byte stream pulled from a PCAP.  This leverages the Linux commands, file, readelf, and strings along with [Binwalk](https://github.com/ReFirmLabs/binwalk) to provide basic analysis of the byte stream.  Results are stored by default in “data_test_out”.  In order to extract the byte stream from a PCAP file, the user is required to define the “getData” function for there specific protocol.   The code has an example using the fake protocol created for this presentation. 
 
+```bash
+usage: data_test.py [-h] [-d DATAFILE] [-o OUTDIR] pcapFile
+
+positional arguments:
+  pcapFile              pcap file containing the data string to parse
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DATAFILE, --datafile DATAFILE
+                        The name of the file to save the data stream too
+  -o OUTDIR, --outdir OUTDIR
+                        The name of the directory to save results to
+```
+
+### read_proto
+The simple script is to serve as an example on how to apply a newly created Scapy layer to a PCAP and print each packet with the layer applied.  
