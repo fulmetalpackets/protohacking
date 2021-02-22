@@ -11,7 +11,7 @@ A Jupyter notebook can be found under "packet analysis" and the code can be inte
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/aboutsecurity/jupyter-notebooks/HEAD)
 
 ## Pcaps
-These PCAPS contain generated packets of a fake protocol made up for this specific webinar.  The protocol was designed having features commonly seen in proprietary protocols.   Each PCAP is one conversation or stream between a client and a server.  To see the code used to generate these PCAPS please look at the “generate_pcap” folder.
+These PCAPS contain generated packets of a fake protocol created for this specific webinar.  The protocol was designed to have features commonly seen in proprietary protocols.   Each PCAP is one conversation or stream between a client and a server.  To see the code used to generate these PCAPS please look at the “generate_pcap” folder.
 
 ## Procotols
 The fake_proto.py contains the scapy layers defining a fake proprietary protocol used for this webinar.  This file was generated from the perspective of a developer not from someone trying to reverse engineer the protocol.  The “fake_proto_steps” folder shows an example of steps a researcher may have taken when trying to reverse engineer this protocol and follows along with the given presentation.   This code can be seen in the “Documentation by Scapy” slides. 
