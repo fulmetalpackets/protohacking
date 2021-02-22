@@ -1,3 +1,5 @@
+#By Douglas McKee @fulmetalpackets
+
 from scapy.all import *
 from fake_proto import *
 

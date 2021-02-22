@@ -1,32 +1,27 @@
+#By Douglas McKee @fulmetalpackets
+
 from scapy.all import *
 import crc16
 
 
 class chksumField(XShortField):
-#    __slots__ = ["chksm"]
 
     def __init__(self,name):
-#        self.chksm = 0xffff
         XShortField.__init__(self,name,0xffff)
 
     def calc(self,b):
         return crc16.crc16xmodem(b)
 
-#    def i2h(self,pkt,val):
-        # val is a byte array
-#       return self.chksm
 
     def addfield(self,pkt,s,val):
-        #self.chksm = self.calc(s)
         return XShortField.addfield(self,pkt,s,self.calc(s))
 
 
 
-#Probably need to come up with a name for this type of packet? 
 #header layer which is the same for all packet types
 class Header(Packet):
     name = "Header"
-    fields_desc = [ IPField("ipaddress", "127.0.0.1"), #consider using SourceIPField type?
+    fields_desc = [ IPField("ipaddress", "127.0.0.1"), 
                     ShortEnumField("message_type",1,{1:"request",2:"respond",3:"heartbeat",4:"data"}),
 
     ]

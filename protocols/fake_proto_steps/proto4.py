@@ -2,7 +2,7 @@ from scapy.all import *
 
 class Header(Packet):
     name = "Header"
-    fields_desc = [ IPField("ipaddress", "127.0.0.1"), #consider using SourceIPField type?
+    fields_desc = [ IPField("ipaddress", "127.0.0.1"), 
                     ShortField("unknown_field",1),
 
     ]
