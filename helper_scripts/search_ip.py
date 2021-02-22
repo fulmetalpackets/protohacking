@@ -1,3 +1,5 @@
+#By Douglas McKee @fulmetalpackets
+
 from scapy.all import *
 import socket, struct
 import argparse 

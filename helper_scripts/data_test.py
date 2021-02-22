@@ -1,3 +1,4 @@
+#By Douglas McKee @fulmetalpackets
 # requires python3, binwalk, numpy-1.19.4 and pyqtgraph-0.11.0
 
 from scapy.all import *
