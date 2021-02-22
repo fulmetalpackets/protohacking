@@ -3,11 +3,18 @@
 This repository contains the code and PCAPS used for the SANS webinar, "Hacking Proprietary Protocols" given on February 23, 2021.  All code was written with Python 3.
 
 ## Presentation Recording
-Presentation link: <TBD>
+Presentation link: TBD
 
 ## Visual Packet Analysis with Panda
 A Jupyter notebook can be found under "packet analysis" and the code can be interacted with using Binder
+
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/aboutsecurity/jupyter-notebooks/HEAD)
+
+## Pcaps
+These PCAPS contain generated packets of a fake protocol made up for this specific webinar.  The protocol was designed having features commonly seen in proprietary protocols.   Each PCAP is one conversation or stream between a client and a server.  To see the code used to generate these PCAPS please look at the “generate_pcap” folder.
+
+## Procotols
+The fake_proto.py contains the scapy layers defining a fake proprietary protocol used for this webinar.  This file was generated from the perspective of a developer not from someone trying to reverse engineer the protocol.  The “fake_proto_steps” folder shows an example of steps a researcher may have taken when trying to reverse engineer this protocol and follows along with the given presentation.   This code can be seen in the “Documentation by Scapy” slides. 
 
 ## Helper Scripts
 These scripts are designed to be used in general analysis of PCAP files.
@@ -46,4 +53,12 @@ optional arguments:
 ```
 
 ### read_proto
-The simple script is to serve as an example on how to apply a newly created Scapy layer to a PCAP and print each packet with the layer applied.  
+The simple script is to serve as an example on how to apply a newly created Scapy layer to a PCAP and print each packet with the layer applied.  Provide the PCAP file as the only argument.
+
+## Generate Pcaps
+This code was used to generate the traffic seen in the Pcap files.  It is not part of the webinar and is not intended to be reused, however is provided here to give context and more examples using Scapy.  This code will produce one conversation per execution.   To run, replace the “server_ip” and “local_ip” variables.  First run server.py on one virtual machine and then run generateTraffic on another within the same network.  
+
+## Helpful Links
+[Scapy](https://scapy.net/)
+[Pandas](https://pandas.pydata.org/)
+
