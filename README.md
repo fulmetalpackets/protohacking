@@ -1,6 +1,10 @@
 # Hacking Proprietary Protocols
-
 This repository contains the code and PCAPS used for the SANS webinar, "Hacking Proprietary Protocols" given on February 23, 2021.  All code was written with Python 3.
+
+## Authors
+Douglas McKee [@fulmetalpackets](https://twitter.com/fulmetalpackets)
+
+Ismael Valenzuela [@aboutsecurity](https://twitter.com/aboutsecurity)
 
 ## Presentation Recording
 Presentation link: TBD
