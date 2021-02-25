@@ -7,7 +7,7 @@ Douglas McKee [@fulmetalpackets](https://twitter.com/fulmetalpackets)
 Ismael Valenzuela [@aboutsecurity](https://twitter.com/aboutsecurity)
 
 ## Presentation Recording
-Presentation link: TBD
+Presentation link: [YouTube](https://www.youtube.com/watch?v=-69E86PnJHM)
 
 ## Visual Packet Analysis with Panda
 A Jupyter notebook can be found under "packet analysis" and the code can be interacted with by using Binder
