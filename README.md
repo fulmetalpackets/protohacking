@@ -8,6 +8,7 @@ Ismael Valenzuela [@aboutsecurity](https://twitter.com/aboutsecurity)
 
 ## Presentation Recording
 Presentation link: [YouTube](https://www.youtube.com/watch?v=-69E86PnJHM)
+Blog link: [Blog](https://www.mcafee.com/blogs/enterprise/security-operations/hacking-proprietary-protocols-with-sharks-and-pandas/)
 
 ## Visual Packet Analysis with Panda
 A Jupyter notebook can be found under "packet analysis" and the code can be interacted with by using Binder
