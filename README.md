@@ -7,10 +7,12 @@ Douglas McKee [@fulmetalpackets](https://twitter.com/fulmetalpackets)
 Ismael Valenzuela [@aboutsecurity](https://twitter.com/aboutsecurity)
 
 ## Presentation Recording
-Presentation link: TBD
+Presentation link: [YouTube](https://www.youtube.com/watch?v=-69E86PnJHM)
+
+Blog link: [Blog](https://www.mcafee.com/blogs/enterprise/security-operations/hacking-proprietary-protocols-with-sharks-and-pandas/)
 
 ## Visual Packet Analysis with Panda
-A Jupyter notebook can be found under "packet analysis" and the code can be interacted with using Binder
+A Jupyter notebook can be found under "packet analysis" and the code can be interacted with by using Binder
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/aboutsecurity/jupyter-notebooks/HEAD)
 
@@ -40,7 +42,7 @@ optional arguments:
 ```
 
 ### data_test
-This script is designed to automate very simple test on a byte stream pulled from a PCAP.  This leverages the Linux commands, file, readelf, and strings along with [Binwalk](https://github.com/ReFirmLabs/binwalk) to provide basic analysis of the byte stream.  Results are stored by default in “data_test_out”.  In order to extract the byte stream from a PCAP file, the user is required to define the “getData” function for there specific protocol.   The code has an example using the fake protocol created for this presentation. 
+This script is designed to automate very simple tests on a byte stream pulled from a PCAP.  This leverages the Linux commands, file, readelf, and strings along with [Binwalk](https://github.com/ReFirmLabs/binwalk) to provide basic analysis of the byte stream.  Results are stored by default in “data_test_out”.  In order to extract the byte stream from a PCAP file, the user is required to define the “getData” function for there specific protocol.   The code has an example using the fake protocol created for this presentation. 
 
 ```bash
 usage: data_test.py [-h] [-d DATAFILE] [-o OUTDIR] pcapFile
