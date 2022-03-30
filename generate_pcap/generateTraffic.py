@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 # Global constants.
 COMPRESSED_FILE = 'stuff.gz'
 CLIENT_IFACE = 'docker0'
