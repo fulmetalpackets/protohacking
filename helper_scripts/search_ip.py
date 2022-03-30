@@ -1,10 +1,6 @@
 # By Douglas McKee @fulmetalpackets
 
-import argparse
-import json
 import socket
-
-from scapy.all import *
 
 # Global constants.
 IP_SIZE = 4
@@ -38,6 +34,11 @@ def find_addresses(payload, align):
     return ips, macs
 
 if __name__ == '__main__':
+    import argparse
+    import json
+
+    from scapy.all import *
+
     parser = argparse.ArgumentParser('Find potential IPv4 and MAC addresses in '
                                      'the packet payloads of a PCAP file.')
     parser.add_argument('pcap',
