@@ -43,7 +43,11 @@ if __name__ == '__main__':
                               f'to. Default is {OUTPUT_FILE}.'))
     args = parser.parse_args()
 
+    # docker0 interface sometimes loses its IP address - this addresses that.
+    if get_if_addr(CLIENT_IFACE) == '0.0.0.0':
+        os.system(f'ip addr add 172.17.0.1/16 dev {CLIENT_IFACE}')
     client_ip = get_if_addr(CLIENT_IFACE)
+
     open_sockets = []
     container = None
     create_container = False
