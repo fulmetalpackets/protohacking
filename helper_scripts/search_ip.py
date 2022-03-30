@@ -111,7 +111,7 @@ if __name__ == '__main__':
               'headers  ############')
     if matching_macs:
         print('\n########## MACs found in payloads that match MACs in Ethernet '
-            'headers ##########')
+              'headers ##########')
         for mac in matching_macs:
             print(f'Packet Number: {mac[1]:03} -> MAC: {mac[0]}')
     else:
