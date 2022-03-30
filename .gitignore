@@ -1,3 +1,4 @@
 *.pyc
 server_output.txt
 search_results.json
+.vscode/
