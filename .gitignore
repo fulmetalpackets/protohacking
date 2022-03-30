@@ -2,3 +2,4 @@
 server_output.txt
 search_results.json
 .vscode/
+__pycache__/
