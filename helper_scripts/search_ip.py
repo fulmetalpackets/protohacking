@@ -121,7 +121,7 @@ if __name__ == '__main__':
         results['All MACs in Payloads'] = [{'Packet Number': y, 'MAC': x}
                                            for x, y in payload_macs]
     results['IPs Matching IP Headers'] = [{'Packet Number': y, 'IP': x}
-                                              for x, y in matching_ips]
+                                          for x, y in matching_ips]
     results['MACs Matching Ethernet Headers'] = [{'Packet Number': y, 'MAC': x}
                                                  for x, y in matching_macs]
     with open(JSON_FILE, 'w') as f:
