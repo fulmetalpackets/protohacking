@@ -39,6 +39,10 @@ if __name__ == '__main__':
                         help='continue sending traffic to server until Ctrl+C')
     parser.add_argument('-b', '--build', action='store_true',
                         help='rebuild the Docker container for the server')
+    parser.add_argument('-o', '--output', type=argparse.FileType('wb'),
+                        default=OUTPUT_FILE,
+                        help=(f'File where the server output will be written '
+                              f'to. Default is {OUTPUT_FILE}.'))
     args = parser.parse_args()
 
     client_ip = get_if_addr(CLIENT_IFACE)
@@ -122,7 +126,7 @@ if __name__ == '__main__':
     server_ip = container.attrs['NetworkSettings']['IPAddress']
 
     # Close all open sockets.
-    def clean_up():
+    def clean_up(output_file):
         print('\nClosing sockets...')
         for socket in list(open_sockets):
             try:
@@ -132,14 +136,14 @@ if __name__ == '__main__':
             finally:
                 open_sockets.remove(socket)
         print('Sockets closed.')
-        print(f'Writing server output to {OUTPUT_FILE}...')
-        with open(OUTPUT_FILE, mode='wb') as file:
+        print(f'Writing server output to {output_file.name}...')
+        with output_file as file:
             file.write(container.logs(since=start_time))
         print(f'Output saved.')
 
     # Signal handler calls clean_up() before exiting.
     def signal_handler(sig, frame):
-        clean_up()
+        clean_up(args.output)
         sys.exit(0)
 
     # Register our signal handler to execute when SIG_INT is received (Ctrl+C).
@@ -230,4 +234,4 @@ if __name__ == '__main__':
         print('Finished transaction.')
         if not args.repeat:
             break
-    clean_up()
+    clean_up(args.output)

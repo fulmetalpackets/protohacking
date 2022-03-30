@@ -52,6 +52,10 @@ if __name__ == '__main__':
                         help=('Assumes a byte alignment when searching for '
                               'addresses in packet payloads. Default assumes '
                               'addresses are 4-byte aligned.'))
+    parser.add_argument('-o', '--output', type=argparse.FileType('w'),
+                        default=JSON_FILE,
+                        help=(f'File where the results will be written to as '
+                              f'JSON. Default is {JSON_FILE}.'))
     args = parser.parse_args()
 
     packets = rdpcap(args.pcap)
@@ -125,6 +129,6 @@ if __name__ == '__main__':
                                           for x, y in matching_ips]
     results['MACs Matching Ethernet Headers'] = [{'Packet Number': y, 'MAC': x}
                                                  for x, y in matching_macs]
-    with open(JSON_FILE, 'w') as f:
-        json.dump(results, f, indent=4)
-    print(f'\nResults saved to {JSON_FILE}.')
+    with args.output as file:
+        json.dump(results, file, indent=4)
+    print(f'\nResults saved to {file.name}.')
