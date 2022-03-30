@@ -1,7 +1,6 @@
 # By Douglas McKee @fulmetalpackets
 
 import argparse
-from encodings import utf_8
 import json
 import socket
 
