@@ -31,7 +31,8 @@ if __name__ == '__main__':
     from scapy.all import *
 
     # Parse command line arguments.
-    parser = argparse.ArgumentParser(description='Generate fake_proto traffic.')
+    parser = argparse.ArgumentParser('Generate fake_proto traffic between a '
+                                     'client and server.')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='display contents of packets sent/received')
     parser.add_argument('-r', '--repeat', action='store_true',
