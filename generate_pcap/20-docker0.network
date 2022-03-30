@@ -1,0 +1,8 @@
+# Place in /etc/systemd/network/ on the VM that will run generateTraffic.py.
+# Prevents systemd-networkd from releasing the IP address for docker0.
+
+[Match]
+Name=docker0
+
+[Link]
+Unmanaged=yes
