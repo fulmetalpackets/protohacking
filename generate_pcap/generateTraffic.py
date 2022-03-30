@@ -123,7 +123,7 @@ if __name__ == '__main__':
     # Get server's IP address.
     server_ip = container.attrs['NetworkSettings']['IPAddress']
 
-    # Close all open sockets.
+    # Close all open sockets and save output from server.
     def clean_up(output_file):
         print('\nClosing sockets...')
         for socket in list(open_sockets):
@@ -156,7 +156,6 @@ if __name__ == '__main__':
 
     # Create TCP StreamSocket.
     tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     open_sockets.append(tcp_socket)
     server_tcp_address = (server_ip, TCP_PORT)
     print(f'Connecting to TCP port at: {server_tcp_address}')
