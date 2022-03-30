@@ -132,7 +132,7 @@ if __name__ == '__main__':
                 open_sockets.remove(socket)
         print('Sockets closed.')
         print(f'Writing server output to {OUTPUT_FILE}...')
-        with open(os.path.join(parent_dir, OUTPUT_FILE), mode='wb') as file:
+        with open(OUTPUT_FILE, mode='wb') as file:
             file.write(container.logs(since=start_time))
         print(f'Output saved.')
 

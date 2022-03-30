@@ -1,72 +1,130 @@
-#By Douglas McKee @fulmetalpackets
+# By Douglas McKee @fulmetalpackets
+
+import argparse
+from encodings import utf_8
+import json
+import socket
 
 from scapy.all import *
-import socket, struct
-import argparse 
 
-#expects a long to convert to an ip address using socket
-def long2ip(ip):
+# Global constants.
+IP_SIZE = 4
+MAC_SIZE = 6
+JSON_FILE = 'search_results.json'
+
+# Converts a byte string to an IPv4 address in human-readable string format.
+def bytes_to_ip(ip):
     return socket.inet_ntoa(ip)
 
-#expects list of tuples where the first value is compared with the passed in value
-def compare(in_list,in_value):
-    for t in in_list:
-        if in_value == t[0]:
-            return True
-    return False
+# Converts a byte string to a MAC address in human-readable string format.
+def bytes_to_mac(mac):
+    if len(mac) != MAC_SIZE:
+        raise ValueError('MAC address should be exactly six bytes')
+    return ':'.join('%02x' % b for b in mac)
 
-# don't save duplicates
-# only searches startin at the first byte of the payload and moves every 4 bytes.  Does not consider every possible 4 byte combination.
-def searchPayload(payload):
-    x = 0
-    while True:
-        temp = payload[x:x+4]
-        if len(temp) % 4  == 0 and temp != b'':
-            ip = long2ip(temp)
-            if not compare(payloadIps,ip):
-                payloadIps.append((ip,packetNumber))
-            if compare(packetIps,ip) and not compare(matchIps,ip):
-                matchIps.append((ip,packetNumber))
-        else:
+# Searches for IPv4 and MAC addresses in a packet payload.
+def find_addresses(payload, align):
+    ips = set()
+    macs = set()
+    for i in range(0, len(payload), align):
+        ip_chunk = payload[i:i+IP_SIZE]
+        if len(ip_chunk) != IP_SIZE:
             break
-        x = x + 4
+        ip = bytes_to_ip(ip_chunk)
+        ips.add(ip)
+        mac_chunk = payload[i:i+MAC_SIZE]
+        if len(mac_chunk) == MAC_SIZE:
+            mac = bytes_to_mac(mac_chunk)
+        macs.add(mac)
+    return ips, macs
 
-# main
-parser = argparse.ArgumentParser()
-parser.add_argument("pcapFile", help="pcap file to search for IPs in payload")
-parser.add_argument("-a",'--all', dest='all', default=False, action='store_true',help="Display all matches. Default only displays IPs found also in IP header")
-args = parser.parse_args()
-packets = rdpcap(args.pcapFile)
-#list of IPs found in the IP layer of the packets
-packetIps = []
-#list of valid IP addresses found in the payloads of the packets
-payloadIps = []
-# IPs found in the payload that match any IPs in the IP layers
-matchIps = []
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser('Find potential IPv4 and MAC addresses in '
+                                     'the packet payloads of a PCAP file.')
+    parser.add_argument('pcap',
+                        help=('The PCAP file that will be searched for IP/MAC '
+                              'addresses.'))
+    parser.add_argument('-a', '--all', action='store_true',
+                        help=('Display all matches. Default only displays '
+                              'addresses also found in Ethernet/IP headers'))
+    parser.add_argument('-b', '--byte-align', type=int, choices=[1, 2, 4, 6, 8],
+                        default=4,
+                        help=('Assumes a byte alignment when searching for '
+                              'addresses in packet payloads. Default assumes '
+                              'addresses are 4-byte aligned.'))
+    args = parser.parse_args()
 
-packetNumber = 1
-payload = None
+    packets = rdpcap(args.pcap)
+    header_ips = []     # IPs found in the IP layer of the packets.
+    header_macs = []    # MACs found in the Ethernet layer of the packets.
+    payload_ips = []    # IPs found in the payloads of the packets.
+    payload_macs = []   # MACs found in the payloads of the packets.
 
-for p in packets:
-    if p[IP].src not in packetIps:
-        packetIps.append((p[IP].src,packetNumber))
-    if p[IP].dst not in packetIps:
-        packetIps.append((p[IP].dst,packetNumber))
+    for pkt_num, pkt in enumerate(packets, 1):
+        header_ips.extend([pkt[IP].src, pkt[IP].dst])
+        header_macs.extend([pkt[Ether].src, pkt[Ether].dst])
 
-    if TCP in p and type(p[TCP].payload) != scapy.packet.NoPayload:
-        payload = bytes(p[TCP].payload)
-    if UDP in p and type(p[UDP].payload) != scapy.packet.NoPayload:
-        payload = bytes(p[UDP].payload)
-    if payload is not None:
-        searchPayload(payload)
-    packetNumber = packetNumber + 1
+        for proto in [TCP, UDP]:
+            if proto in pkt and not isinstance(pkt[proto].payload, NoPayload):
+                payload = bytes(pkt[proto].payload)
+                ips, macs = find_addresses(payload, args.byte_align)
+                payload_ips.extend([(x, pkt_num) for x in ips
+                                    if x not in [x[0] for x in payload_ips]])
+                payload_macs.extend([(x, pkt_num) for x in macs
+                                     if x not in [x[0] for x in payload_macs]])
 
-print("\n*** Only reporting first packet IP is discovered in ***")
-if args.all:
-    print("\n########## Possible IPs found in payloads ##############")
-    for i in payloadIps:
-        print("Packet Number:" + str(i[1]) + " IP: " + i[0])
+    matching_ips = [x for x in payload_ips if x[0] in header_ips]
+    matching_macs = [x for x in payload_macs if x[0] in header_macs]
 
-print("\n########## Possible IPs found in payload that match packets source or destination IPs ##############")
-for m in matchIps:
-    print("Packet Number:" + str(m[1]) + " IP: " + m[0])
+    # Print the results to the screen.
+    print('\n********* Only reporting first packet IP/MAC address is '
+          'discovered in  *********')
+    if args.all:
+        if payload_ips:
+            print('\n################### Possible IP addresses found in '
+                  'payloads  ###################')
+            for ip in payload_ips:
+                print(f'Packet Number: {ip[1]:03} -> IP: {ip[0]}')
+        else:
+            print('\n################### No IP addresses found in packet '
+                  'payloads ###################')
+        if payload_macs:
+            print('\n################### Possible MAC addresses found in '
+                  'payloads ###################')
+            for mac in payload_macs:
+                print(f'Packet Number: {mac[1]:03} -> MAC: {mac[0]}')
+        else:
+            print('\n################## No MAC addresses found in packet '
+                  'payloads  ##################')
+
+    if matching_ips:
+        print('\n############## IPs found in payloads that match IPs in IP '
+              'headers ##############')
+        for ip in matching_ips:
+            print(f'Packet Number: {ip[1]:03} -> IP: {ip[0]}')
+    else:
+        print('\n############ No IPs found in payloads that match IPs in IP '
+              'headers  ############')
+    if matching_macs:
+        print('\n########## MACs found in payloads that match MACs in Ethernet '
+            'headers ##########')
+        for mac in matching_macs:
+            print(f'Packet Number: {mac[1]:03} -> MAC: {mac[0]}')
+    else:
+        print('\n######## No MACs found in payloads that match MACs in '
+              'Ethernet headers  ########')
+
+    # Save the results to a JSON file.
+    results = {}
+    if args.all:
+        results['All IPs in Payloads'] = [{'Packet Number': y, 'IP': x}
+                                          for x, y in payload_ips]
+        results['All MACs in Payloads'] = [{'Packet Number': y, 'MAC': x}
+                                           for x, y in payload_macs]
+    results['IPs Matching IP Headers'] = [{'Packet Number': y, 'IP': x}
+                                              for x, y in matching_ips]
+    results['MACs Matching Ethernet Headers'] = [{'Packet Number': y, 'MAC': x}
+                                                 for x, y in matching_macs]
+    with open(JSON_FILE, 'w') as f:
+        json.dump(results, f, indent=4)
+    print(f'\nResults saved to {JSON_FILE}.')
