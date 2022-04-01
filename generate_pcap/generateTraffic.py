@@ -1,4 +1,5 @@
 # Global constants.
+SESSION_ID_SIZE = 5
 COMPRESSED_FILE = 'stuff.gz'
 CLIENT_IFACE = 'docker0'
 TCP_PORT = 1234
@@ -26,14 +27,13 @@ if __name__ == '__main__':
 
     from datetime import datetime
     from protocols.fake_proto import *
-    from secrets import SystemRandom
     from scapy.all import *
 
     # Parse command line arguments.
     parser = argparse.ArgumentParser('Generate fake_proto traffic between a '
                                      'client and server.')
     parser.add_argument('-v', '--verbose', action='store_true',
-                        help='display contents of packets sent/received')
+                        help=argparse.SUPPRESS)
     parser.add_argument('-r', '--repeat', action='store_true',
                         help='continue sending traffic to server until Ctrl+C')
     parser.add_argument('-b', '--build', action='store_true',
@@ -170,8 +170,7 @@ if __name__ == '__main__':
     time.sleep(LONG_SLEEP_DUR) # Wait for "waiting for data...." message.
 
     while True:
-        session_id_size = SystemRandom().randrange(2, 9)
-        session_id = os.urandom(session_id_size)
+        session_id = os.urandom(SESSION_ID_SIZE)
         hb_int = 0
         pkt_sent = 0
         gcount = 0
