@@ -25,7 +25,7 @@ def parse_data(receive_pkt):
         receive_pkt.show()
         session = receive_pkt[TCP][Request].sessionId
         send_pkt = (Header(ipaddress=server_ip, message_type=2)
-                    /Respond(sessionId=session, heartbeat_interval=3))
+                    /Respond(sessionId=session, heartbeat_interval=random.randint(1, 7)))
         print('Sending the following response packet via TCP:')
         send_pkt.show()
         tcp_connection.sendall(bytes(send_pkt))
